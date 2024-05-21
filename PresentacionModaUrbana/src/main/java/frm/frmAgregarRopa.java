@@ -1,8 +1,8 @@
 
 package frm;
 
-import Dominio.Inventario;
-import Dominio.Producto;
+import Entity.Inventario;
+import Entity.Producto;
 import javax.swing.JOptionPane;
 
 /**

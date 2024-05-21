@@ -1,5 +1,5 @@
 
-package Dominio;
+package Entity;
 import java.util.Map;
 import org.bson.types.ObjectId;
 /**
