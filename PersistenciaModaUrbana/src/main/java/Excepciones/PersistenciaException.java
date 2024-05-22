@@ -23,10 +23,10 @@ public class PersistenciaException extends Exception {
         super(cause);
     }
 }
-
-/**
- * Excepción lanzada cuando no se encuentra un recurso en la capa de persistencia.
- */
+//
+///**
+// * Excepción lanzada cuando no se encuentra un recurso en la capa de persistencia.
+// */
 //public class RecursoNoEncontradoException extends PersistenciaException {
 //
 //    public RecursoNoEncontradoException() {

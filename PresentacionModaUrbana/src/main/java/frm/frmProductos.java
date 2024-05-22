@@ -30,6 +30,7 @@ public class frmProductos extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnRegresar = new javax.swing.JButton();
         tablaRopa = new javax.swing.JScrollPane();
+        tabla = new javax.swing.JTable();
         jComboBox1 = new javax.swing.JComboBox<>();
         jComboBox2 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
@@ -52,6 +53,19 @@ public class frmProductos extends javax.swing.JFrame {
                 btnRegresarActionPerformed(evt);
             }
         });
+
+        tabla.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Nombre", "Categoria", "Talla", "Precio"
+            }
+        ));
+        tablaRopa.setViewportView(tabla);
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Categoria", "Mujeres", "Hombres", "Infantil" }));
 
@@ -174,6 +188,7 @@ public class frmProductos extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTable tabla;
     private javax.swing.JScrollPane tablaRopa;
     // End of variables declaration//GEN-END:variables
 }

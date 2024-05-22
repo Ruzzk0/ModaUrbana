@@ -1,7 +1,12 @@
 
 package com.mycompany.dominiodto;
-
+import java.util.List;
 import java.util.Map;
+import java.util.List;
+import com.mycompany.dominiodto.ProductoDTO;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import java.util.ArrayList;
 
 /**
  *
@@ -71,10 +76,5 @@ public class ProductoDTO {
         return tallasCantidades;
     }
 
-    public void setTallasCantidades(Map<String, Integer> tallasCantidades) {
-        this.tallasCantidades = tallasCantidades;
-    }
-    
-    
     
 }

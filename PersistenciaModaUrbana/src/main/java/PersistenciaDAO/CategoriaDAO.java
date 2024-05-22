@@ -15,48 +15,60 @@ import java.util.List;
 import org.bson.conversions.Bson;
 
 /**
- *
- * @author Ruzzky
+ * Clase que implementa las operaciones de acceso a datos para la entidad CategoriaDTO en MongoDB.
+ * 
+ * <p>Esta clase proporciona métodos para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+ * sobre documentos de categorías almacenados en una colección MongoDB.</p>
+ * 
+ * @see CategoriaDTO
+ * 
+ * @autor Ruzzky
  */
 public class CategoriaDAO implements ICategoriaDAO {
 
+    /**
+     * Obtiene la colección MongoDB para la entidad CategoriaDTO.
+     * 
+     * @return La colección MongoDB para la entidad CategoriaDTO.
+     */
     public MongoCollection<CategoriaDTO> obtenerColeccion() {
         MongoDatabase db = MongoDBconexion.getInstance();
-        MongoCollection<CategoriaDTO> colleccionClimas = db.getCollection("CategoriaDTO", CategoriaDTO.class);
-        return colleccionClimas;
+        MongoCollection<CategoriaDTO> coleccionCategorias = db.getCollection("CategoriaDTO", CategoriaDTO.class);
+        return coleccionCategorias;
     }
 
     @Override
     public List<CategoriaDTO> obtenerTodas() {
-        List<CategoriaDTO> cate = new ArrayList<>();
-        cate = obtenerColeccion().find().into(new ArrayList<>());
-        return cate;
+        List<CategoriaDTO> categorias = new ArrayList<>();
+        categorias = obtenerColeccion().find().into(new ArrayList<>());
+        return categorias;
     }
 
     @Override
     public CategoriaDTO obtenerPorNombre(String nombre) {
-        CategoriaDTO cate = obtenerColeccion().find(eq("nombre", nombre)).first();
-        return cate;
+        CategoriaDTO categoria = obtenerColeccion().find(eq("nombre", nombre)).first();
+        return categoria;
     }
 
     @Override
     public void crear(CategoriaDTO categoria) {
-        MongoCollection<CategoriaDTO> coleccionP = obtenerColeccion();
+        MongoCollection<CategoriaDTO> coleccionCategorias = obtenerColeccion();
         try {
-            coleccionP.insertOne(categoria);
+            coleccionCategorias.insertOne(categoria);
         } catch (MongoException e) {
+            // Manejar excepción
         }
     }
 
     @Override
     public void actualizar(CategoriaDTO categoria) {
-         MongoCollection<CategoriaDTO> coleccionP = obtenerColeccion();
+        MongoCollection<CategoriaDTO> coleccionCategorias = obtenerColeccion();
         Bson filtro = Filters.eq("nombre", categoria.getNombre());
         Bson actualizacion = Updates.combine(
-            Updates.set("productos", categoria.getProductos())// Añadir más propiedades según sea necesario
+            Updates.set("productos", categoria.getProductos()) // Añadir más propiedades según sea necesario
         );
         try {
-            UpdateResult resultado = coleccionP.updateOne(filtro, actualizacion);
+            UpdateResult resultado = coleccionCategorias.updateOne(filtro, actualizacion);
             if (resultado.getMatchedCount() == 0) {
                 // Manejar caso en el que no se encontró el documento
             }
@@ -67,10 +79,10 @@ public class CategoriaDAO implements ICategoriaDAO {
 
     @Override
     public void eliminar(String nombre) {
-        MongoCollection<CategoriaDTO> coleccionP = obtenerColeccion();
+        MongoCollection<CategoriaDTO> coleccionCategorias = obtenerColeccion();
         Bson filtro = Filters.eq("nombre", nombre);
         try {
-            DeleteResult resultado = coleccionP.deleteOne(filtro);
+            DeleteResult resultado = coleccionCategorias.deleteOne(filtro);
             if (resultado.getDeletedCount() == 0) {
                 // Manejar caso en el que no se encontró el documento
             }
@@ -78,5 +90,4 @@ public class CategoriaDAO implements ICategoriaDAO {
             // Manejar excepción
         }
     }
-
 }

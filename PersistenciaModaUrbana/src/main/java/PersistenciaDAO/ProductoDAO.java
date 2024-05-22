@@ -16,19 +16,28 @@ import java.util.Map;
 import org.bson.conversions.Bson;
 
 /**
- *
- * @author Ruzzky
+ * Clase que implementa las operaciones de acceso a datos para la entidad ProductoDTO en MongoDB.
+ * 
+ * Esta clase proporciona métodos para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+ * sobre documentos de productos almacenados en una colección MongoDB.
+ * @autor Ruzzky
  */
 public class ProductoDAO implements IProductoDAO {
 
+    /**
+     * Obtiene la colección MongoDB para la entidad ProductoDTO.
+     * 
+     * @return La colección MongoDB para la entidad ProductoDTO.
+     */
     public MongoCollection<ProductoDTO> obtenerColeccion() {
         MongoDatabase db = MongoDBconexion.getInstance();
-        MongoCollection<ProductoDTO> colleccionProductos = db.getCollection("ProductoDTO", ProductoDTO.class);
-        return colleccionProductos;
+        MongoCollection<ProductoDTO> coleccionProductos = db.getCollection("ProductoDTO", ProductoDTO.class);
+        return coleccionProductos;
     }
 
     @Override
     public List<ProductoDTO> obtenerTodos() {
+        ProductoDAO productoDAO = new ProductoDAO();
         List<ProductoDTO> productos = new ArrayList<>();
         productos = obtenerColeccion().find().into(new ArrayList<>());
         return productos;

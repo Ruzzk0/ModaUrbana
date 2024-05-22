@@ -1,23 +1,48 @@
-
 package Entity;
+
 import java.util.Map;
 import org.bson.types.ObjectId;
+
 /**
- *
- * @author Ruzzky
+ * Clase que representa un producto en el inventario.
+ * 
+ * @autor Ruzzky
  */
 public class Producto {
 
-    private String id; // Identificador único del producto
+    // Identificador único del producto
+    private String id;
+    
+    // Nombre del producto
     private String nombre;
+    
+    // Descripción del producto
     private String descripcion;
-    private Categoria categoria; // Objeto de la clase Categoria
+    
+    // Categoría a la que pertenece el producto (Objeto de la clase Categoria)
+    private Categoria categoria;
+    
+    // Precio del producto
     private double precio;
-    private Map<String, Integer> tallasCantidades; //  talla,  cantidad en stock
+    
+    // Mapa de tallas y cantidades, donde la clave es la talla y el valor es la cantidad en stock
+    private Map<String, Integer> tallasCantidades;
 
+    /**
+     * Constructor por defecto.
+     */
     public Producto() {
     }
 
+    /**
+     * Constructor con parámetros.
+     * 
+     * @param nombre El nombre del producto.
+     * @param descripcion La descripción del producto.
+     * @param categoria La categoría a la que pertenece el producto.
+     * @param precio El precio del producto.
+     * @param tallasCantidades El mapa de tallas y cantidades del producto.
+     */
     public Producto(String nombre, String descripcion, Categoria categoria, double precio, Map<String, Integer> tallasCantidades) {
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -26,62 +51,111 @@ public class Producto {
         this.tallasCantidades = tallasCantidades;
     }
 
+    /**
+     * Obtiene el identificador único del producto.
+     * 
+     * @return El identificador del producto.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Establece el identificador único del producto.
+     * 
+     * @param id El nuevo identificador del producto.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Obtiene el nombre del producto.
+     * 
+     * @return El nombre del producto.
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * Establece el nombre del producto.
+     * 
+     * @param nombre El nuevo nombre del producto.
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     * Obtiene la descripción del producto.
+     * 
+     * @return La descripción del producto.
+     */
     public String getDescripcion() {
         return descripcion;
     }
 
+    /**
+     * Establece la descripción del producto.
+     * 
+     * @param descripcion La nueva descripción del producto.
+     */
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
 
+    /**
+     * Obtiene la categoría del producto.
+     * 
+     * @return La categoría del producto.
+     */
     public Categoria getCategoria() {
         return categoria;
     }
 
+    /**
+     * Establece la categoría del producto.
+     * 
+     * @param categoria La nueva categoría del producto.
+     */
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
+    /**
+     * Obtiene el precio del producto.
+     * 
+     * @return El precio del producto.
+     */
     public double getPrecio() {
         return precio;
     }
 
+    /**
+     * Establece el precio del producto.
+     * 
+     * @param precio El nuevo precio del producto.
+     */
     public void setPrecio(double precio) {
         this.precio = precio;
     }
 
+    /**
+     * Obtiene el mapa de tallas y cantidades del producto.
+     * 
+     * @return El mapa de tallas y cantidades del producto.
+     */
     public Map<String, Integer> getTallasCantidades() {
         return tallasCantidades;
     }
 
+    /**
+     * Establece el mapa de tallas y cantidades del producto.
+     * 
+     * @param tallasCantidades El nuevo mapa de tallas y cantidades del producto.
+     */
     public void setTallasCantidades(Map<String, Integer> tallasCantidades) {
         this.tallasCantidades = tallasCantidades;
     }
-
-    @Override
-    public String toString() {
-        return "Producto{" + "id=" + id + ", nombre="
-                + nombre + ", descripcion=" + descripcion 
-                + ", categoria=" + categoria + ", precio=" 
-                + precio + ", tallasCantidades=" + tallasCantidades + '}';
-    }
-    
-    
-    
 }
