@@ -9,9 +9,9 @@ import org.bson.types.ObjectId;
  * @autor Ruzzky
  */
 public class Producto {
-
+    
     // Identificador único del producto
-    private String id;
+    private ObjectId id;
     
     // Nombre del producto
     private String nombre;
@@ -51,21 +51,21 @@ public class Producto {
         this.tallasCantidades = tallasCantidades;
     }
 
+    public ObjectId getId() {
+        return id;
+    }
+
     /**
      * Obtiene el identificador único del producto.
      * 
      * @return El identificador del producto.
      */
-    public String getId() {
-        return id;
-    }
-
     /**
      * Establece el identificador único del producto.
      * 
      * @param id El nuevo identificador del producto.
      */
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 

@@ -1,28 +1,20 @@
 
 package com.mycompany.dominiodto;
-import java.util.List;
-import java.util.Map;
-import java.util.List;
-import com.mycompany.dominiodto.ProductoDTO;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import java.util.ArrayList;
 
-/**
- *
- * @author Ruzzky
- */
+import java.util.Map;
+import org.bson.types.ObjectId;
+
 public class ProductoDTO {
-     private String id;
+    private String idProducto;
+    private ObjectId _id;
     private String nombre;
     private String descripcion;
     private CategoriaDTO categoria;
     private double precio;
     private Map<String, Integer> tallasCantidades;
 
-    // Constructores, getters y setters
-
-    public ProductoDTO() {}
+    public ProductoDTO() {
+    }
 
     public ProductoDTO(String nombre, String descripcion, CategoriaDTO categoria, double precio, Map<String, Integer> tallasCantidades) {
         this.nombre = nombre;
@@ -32,13 +24,27 @@ public class ProductoDTO {
         this.tallasCantidades = tallasCantidades;
     }
 
-    public String getId() {
-        return id;
+    // Getters y Setters
+    
+    
+
+    public ObjectId getId() {
+        return _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(ObjectId _id) {
+        this._id = _id;
     }
+    
+        public String getIdProducto() {
+        return _id != null ? _id.toHexString() : null;
+    }
+
+    public void setIdProducto(String idProducto) {
+        this.idProducto = idProducto;
+        this._id = new ObjectId(idProducto);
+    }
+
 
     public String getNombre() {
         return nombre;
@@ -76,5 +82,7 @@ public class ProductoDTO {
         return tallasCantidades;
     }
 
-    
+    public void setTallasCantidades(Map<String, Integer> tallasCantidades) {
+        this.tallasCantidades = tallasCantidades;
+    }
 }

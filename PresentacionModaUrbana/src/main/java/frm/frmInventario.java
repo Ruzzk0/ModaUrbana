@@ -3,19 +3,52 @@ package frm;
 
 import PersistenciaDAO.ProductoDAO;
 import com.mycompany.dominiodto.ProductoDTO;
-import java.awt.List;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.bson.types.ObjectId;
+
+
 
 /**
  *
  * @author Ruzzky
  */
 public class frmInventario extends javax.swing.JFrame {
-
     public frmInventario() {
-          initComponents();
-    
+        initComponents();
+        actualizarTablaInventario();
+        
     }
+    
+
+public void actualizarTablaInventario() {
+        DefaultTableModel modelo = new DefaultTableModel(new Object[]{"ID", "Nombre", "Categoria", "Talla", "Cantidad", "Precio"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tabla.setModel(modelo);
+        modelo.setRowCount(0);
+        ProductoDAO productoDAO = new ProductoDAO();
+        List<ProductoDTO> productos = productoDAO.obtenerTodos();
+        for (ProductoDTO producto : productos) {
+            ObjectId id = producto.getId();
+            String nombre = producto.getNombre();
+            String categoria = producto.getCategoria().getNombre();
+            for (Map.Entry<String, Integer> entry : producto.getTallasCantidades().entrySet()) {
+                String talla = entry.getKey();
+                int cantidad = entry.getValue();
+                double precio = producto.getPrecio();
+                modelo.addRow(new Object[]{id.toString(), nombre, categoria, talla, cantidad, precio});
+            }
+        }
+    }
+
+
+    
 
 
     @SuppressWarnings("unchecked")
@@ -54,13 +87,13 @@ public class frmInventario extends javax.swing.JFrame {
 
         tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Nombre", "Categoria", "Talla", "Precio"
+                "ID", "Nombre", "Categoria", "Talla", "Cantidad", "Precio"
             }
         ));
         tablaRopa.setViewportView(tabla);
@@ -70,6 +103,11 @@ public class frmInventario extends javax.swing.JFrame {
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Talla", "S", "M", "L", "XL" }));
 
         btnBuscar.setText("🔎    Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Tipo de ropa:");
 
@@ -112,18 +150,18 @@ public class frmInventario extends javax.swing.JFrame {
                         .addComponent(txtTipoRopa, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(169, 169, 169)
                         .addComponent(btnBuscar))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(btnRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(131, 131, 131)
-                            .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                            .addGap(16, 16, 16)
-                            .addComponent(tablaRopa, javax.swing.GroupLayout.PREFERRED_SIZE, 667, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(25, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addComponent(tablaRopa, javax.swing.GroupLayout.PREFERRED_SIZE, 715, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(45, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(122, 122, 122)
+                .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(85, 85, 85))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -171,9 +209,22 @@ public class frmInventario extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRegresarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-         frmeditar editar = new frmeditar();
+    int filaSeleccionada = tabla.getSelectedRow();
+    if (filaSeleccionada != -1) {
+        String idProducto = tabla.getValueAt(filaSeleccionada, 0).toString(); // Obtener el ID del producto de la fila seleccionada
+        frmeditar editar = new frmeditar(idProducto); // Pasar el ID del producto al constructor de frmeditar
         editar.setVisible(true);
+        editar.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                actualizarTablaInventario();
+            }
+        });
         this.dispose();
+    } else {
+        JOptionPane.showMessageDialog(this, "Seleccione una fila para editar", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
@@ -181,6 +232,35 @@ public class frmInventario extends javax.swing.JFrame {
         agregar.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnAgregarActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+          String categoriaSeleccionada = jComboBox1.getSelectedItem().toString();
+        String tallaSeleccionada = jComboBox2.getSelectedItem().toString();
+        String tipoRopa = txtTipoRopa.getText().trim().toLowerCase();
+
+        ProductoDAO productoDAO = new ProductoDAO();
+        List<ProductoDTO> productos = productoDAO.obtenerTodos();
+
+        DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
+        modelo.setRowCount(0);
+
+        for (ProductoDTO producto : productos) {
+            boolean coincideCategoria = categoriaSeleccionada.equals("Categoria") || producto.getCategoria().getNombre().equalsIgnoreCase(categoriaSeleccionada);
+            boolean coincideTalla = tallaSeleccionada.equals("Talla") || producto.getTallasCantidades().containsKey(tallaSeleccionada);
+            boolean coincideTipoRopa = tipoRopa.isEmpty() || producto.getNombre().toLowerCase().contains(tipoRopa);
+
+            if (coincideCategoria && coincideTalla && coincideTipoRopa) {
+                ObjectId id = producto.getId();
+                String nombre = producto.getNombre();
+                String categoria = producto.getCategoria().getNombre();
+                for (Map.Entry<String, Integer> entry : producto.getTallasCantidades().entrySet()) {
+                    String talla = entry.getKey();
+                    int cantidad = entry.getValue();
+                    double precio = producto.getPrecio();
+                    if (tallaSeleccionada.equals("Talla") || talla.equals(tallaSeleccionada)) {
+                        modelo.addRow(new Object[]{id.toString(), nombre, categoria, talla, cantidad, precio});
+                    }}}}
+    }//GEN-LAST:event_btnBuscarActionPerformed
 
    
     public static void main(String args[]) {

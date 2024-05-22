@@ -1,11 +1,11 @@
 
 package frm;
 
-
+import PersistenciaDAO.ProductoDAO;
 import com.mycompany.dominiodto.CategoriaDTO;
 import com.mycompany.dominiodto.ProductoDTO;
-import javax.swing.JOptionPane;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -178,7 +178,35 @@ public class frmAgregarRopa extends javax.swing.JFrame {
     }//GEN-LAST:event_RegresarActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+String tipoRopa = txtTipoRopa.getText();
+    String categoria = jComboBox1.getSelectedItem().toString();
+    String talla = jComboBox2.getSelectedItem().toString();
+    int cantidad = Integer.parseInt(txtCantidad.getText());
+    double precio = Double.parseDouble(txtPrecio.getText());
 
+    CategoriaDTO categoriaDTO = new CategoriaDTO();
+    categoriaDTO.setNombre(categoria);
+
+    Map<String, Integer> tallasCantidades = new HashMap<>();
+    tallasCantidades.put(talla, cantidad);
+
+    ProductoDTO nuevoProducto = new ProductoDTO();
+    nuevoProducto.setNombre(tipoRopa);
+    nuevoProducto.setDescripcion("");
+    nuevoProducto.setCategoria(categoriaDTO);
+    nuevoProducto.setPrecio(precio);
+    nuevoProducto.setTallasCantidades(tallasCantidades);
+
+    ProductoDAO productoDAO = new ProductoDAO();
+    productoDAO.guardarProducto(nuevoProducto);
+
+    frmInventario inventario = new frmInventario();
+    inventario.setVisible(true);
+    inventario.actualizarTablaInventario();
+
+    txtTipoRopa.setText("");
+    txtCantidad.setText("");
+    txtPrecio.setText("");
 
     }//GEN-LAST:event_btnGuardarActionPerformed
 

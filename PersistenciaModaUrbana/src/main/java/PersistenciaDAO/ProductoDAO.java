@@ -9,11 +9,14 @@ import static com.mongodb.client.model.Filters.eq;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import com.mycompany.dominiodto.CategoriaDTO;
 import com.mycompany.dominiodto.ProductoDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 /**
  * Clase que implementa las operaciones de acceso a datos para la entidad ProductoDTO en MongoDB.
@@ -24,6 +27,43 @@ import org.bson.conversions.Bson;
  */
 public class ProductoDAO implements IProductoDAO {
 
+    
+    private MongoDatabase database;
+
+   public ProductoDAO() {
+        this.database = MongoDBconexion.getInstance();
+    }
+
+   public void guardarProducto(ProductoDTO producto) {
+        MongoCollection<Document> collection = database.getCollection("productos");
+        Document doc = new Document("nombre", producto.getNombre())
+                            .append("descripcion", producto.getDescripcion())
+                            .append("categoria", producto.getCategoria().getNombre())
+                            .append("precio", producto.getPrecio())
+                            .append("tallasCantidades", producto.getTallasCantidades());
+        collection.insertOne(doc);
+    }
+
+    public List<ProductoDTO> obtenerTodos() {
+        MongoCollection<Document> collection = database.getCollection("productos");
+        List<ProductoDTO> productos = new ArrayList<>();
+
+        for (Document doc : collection.find()) {
+            ProductoDTO producto = new ProductoDTO();
+            producto.setId(doc.getObjectId("_id"));
+            producto.setNombre(doc.getString("nombre"));
+            producto.setDescripcion(doc.getString("descripcion"));
+            CategoriaDTO categoria = new CategoriaDTO();
+            categoria.setNombre(doc.getString("categoria"));
+            producto.setCategoria(categoria);
+            producto.setPrecio(doc.getDouble("precio"));
+            producto.setTallasCantidades((Map<String, Integer>) doc.get("tallasCantidades"));
+
+            productos.add(producto);
+        }
+        return productos;
+    }
+    
     /**
      * Obtiene la colección MongoDB para la entidad ProductoDTO.
      * 
@@ -35,13 +75,6 @@ public class ProductoDAO implements IProductoDAO {
         return coleccionProductos;
     }
 
-    @Override
-    public List<ProductoDTO> obtenerTodos() {
-        ProductoDAO productoDAO = new ProductoDAO();
-        List<ProductoDTO> productos = new ArrayList<>();
-        productos = obtenerColeccion().find().into(new ArrayList<>());
-        return productos;
-    }
 
     @Override
     public ProductoDTO obtenerPorId(String id) {
@@ -79,19 +112,22 @@ public class ProductoDAO implements IProductoDAO {
         }
     }
 
-    @Override
-    public void eliminar(String id) {
-        MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
-        Bson filtro = Filters.eq("_id", id);
-        try {
-            DeleteResult resultado = coleccionProductos.deleteOne(filtro);
-            if (resultado.getDeletedCount() == 0) {
-                // Manejar caso en el que no se encontró el documento
-            }
-        } catch (MongoException e) {
-            // Manejar excepción
+@Override
+public void eliminar(String id) {
+    MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
+    Bson filtro = Filters.eq("_id", new ObjectId(id));
+    try {
+        DeleteResult resultado = coleccionProductos.deleteOne(filtro);
+        if (resultado.getDeletedCount() == 0) {
+            // Manejar caso en el que no se encontró el documento
+            System.out.println("No se encontró el documento con id: " + id);
         }
+    } catch (MongoException e) {
+        // Manejar excepción
+        e.printStackTrace();
     }
+}
+
 
     @Override
     public Map<String, Integer> obtenerTallasCantidades(String id) {
@@ -100,17 +136,21 @@ public class ProductoDAO implements IProductoDAO {
     }
 
     @Override
-    public void actualizarTallasCantidades(String id, Map<String, Integer> tallasCantidades) {
-        MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
-        Bson filtro = Filters.eq("_id", id);
-        Bson actualizacion = Updates.set("tallasCantidades", tallasCantidades);
-        try {
-            UpdateResult resultado = coleccionProductos.updateOne(filtro, actualizacion);
-            if (resultado.getMatchedCount() == 0) {
-                // Manejar caso en el que no se encontró el documento
-            }
-        } catch (MongoException e) {
-            // Manejar excepción
+public void actualizarTallasCantidades(String id, Map<String, Integer> tallasCantidades) {
+    MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
+    Bson filtro = Filters.eq("_id", new ObjectId(id)); 
+    Bson actualizacion = Updates.set("tallasCantidades", tallasCantidades);
+    try {
+        UpdateResult resultado = coleccionProductos.updateOne(filtro, actualizacion);
+        if (resultado.getMatchedCount() == 0) {
+            // Manejar caso en el que no se encontró el documento
         }
+    } catch (MongoException e) {
+        // Manejar excepción
     }
+}
+
+    
+
+
 }

@@ -16,19 +16,21 @@ import org.bson.codecs.pojo.PojoCodecProvider;
  * @author Ruzzky
  */
 public class MongoDBconexion {
-
-  private static MongoDatabase instancia;
-
+    private static MongoDatabase instancia;
 
     public static MongoDatabase getInstance() {
         if (instancia == null) {
-            CodecRegistry co = fromRegistries(
-            MongoClientSettings.getDefaultCodecRegistry(),
-            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-            MongoClientSettings setting = MongoClientSettings.builder().codecRegistry(co).build();
-            MongoClient conexion = MongoClients.create(setting);
+            CodecRegistry pojoCodecRegistry = fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build())
+            );
+            MongoClientSettings settings = MongoClientSettings.builder()
+                .codecRegistry(pojoCodecRegistry)
+                .build();
+            MongoClient conexion = MongoClients.create(settings);
             instancia = conexion.getDatabase("ModaUrbana");
         }
         return instancia;
     }
 }
+
