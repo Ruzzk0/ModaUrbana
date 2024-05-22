@@ -6,6 +6,7 @@ import com.mycompany.dominiodto.CategoriaDTO;
 import com.mycompany.dominiodto.ProductoDTO;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -178,11 +179,44 @@ public class frmAgregarRopa extends javax.swing.JFrame {
     }//GEN-LAST:event_RegresarActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-String tipoRopa = txtTipoRopa.getText();
+      String tipoRopa = txtTipoRopa.getText();
     String categoria = jComboBox1.getSelectedItem().toString();
     String talla = jComboBox2.getSelectedItem().toString();
-    int cantidad = Integer.parseInt(txtCantidad.getText());
-    double precio = Double.parseDouble(txtPrecio.getText());
+    String cantidadText = txtCantidad.getText();
+    String precioText = txtPrecio.getText();
+
+    // Validar tipo de ropa (solo letras)
+    if (!tipoRopa.matches("[a-zA-Z]+")) {
+        // Mostrar mensaje de error o realizar alguna acción
+        JOptionPane.showMessageDialog(null, "El tipo de ropa solo debe contener letras.");
+        return; // Salir del método si la validación falla
+    }
+
+    // Validar cantidad (números enteros positivos)
+    int cantidad;
+    try {
+        cantidad = Integer.parseInt(cantidadText);
+        if (cantidad <= 0) {
+            JOptionPane.showMessageDialog(null, "La cantidad debe ser un número entero positivo.");
+            return;
+        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "La cantidad debe ser un número entero positivo.");
+        return;
+    }
+
+    // Validar precio (números positivos y decimales)
+    double precio;
+    try {
+        precio = Double.parseDouble(precioText);
+        if (precio <= 0) {
+            JOptionPane.showMessageDialog(null, "El precio debe ser un número positivo.");
+            return;
+        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "El precio debe ser un número positivo.");
+        return;
+    }
 
     CategoriaDTO categoriaDTO = new CategoriaDTO();
     categoriaDTO.setNombre(categoria);
@@ -206,7 +240,8 @@ String tipoRopa = txtTipoRopa.getText();
 
     txtTipoRopa.setText("");
     txtCantidad.setText("");
-    txtPrecio.setText("");
+    txtPrecio.setText("");  
+        
 
     }//GEN-LAST:event_btnGuardarActionPerformed
 

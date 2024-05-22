@@ -17,6 +17,7 @@ public class frmProductos extends javax.swing.JFrame {
   
     public frmProductos() {
         initComponents();
+        jButton1ActionPerformed(null);
     }
     
     
