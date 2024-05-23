@@ -6,6 +6,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Filters.eq;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -31,7 +32,7 @@ public class ProductoDAO implements IProductoDAO {
     private MongoDatabase database;
 
    public ProductoDAO() {
-        this.database = MongoDBconexion.getInstance();
+         database = MongoDBconexion.getInstance();
     }
 
    public void guardarProducto(ProductoDTO producto) {
@@ -92,25 +93,26 @@ public class ProductoDAO implements IProductoDAO {
         }
     }
 
-    @Override
-    public void actualizar(ProductoDTO producto) {
-        MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
+
+
+@Override
+public void actualizar(ProductoDTO producto) {
+    MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
+    
+    try {
         Bson filtro = Filters.eq("_id", producto.getId());
-        Bson actualizacion = Updates.combine(
-                Updates.set("nombre", producto.getNombre()),
-                Updates.set("precio", producto.getPrecio()),
-                Updates.set("descripcion", producto.getDescripcion()),
-                Updates.set("tallasCantidades", producto.getTallasCantidades())
-        );
-        try {
-            UpdateResult resultado = coleccionProductos.updateOne(filtro, actualizacion);
-            if (resultado.getMatchedCount() == 0) {
-                // Manejar caso en el que no se encontró el documento
-            }
-        } catch (MongoException e) {
-            // Manejar excepción
+        UpdateResult resultado = coleccionProductos.replaceOne(filtro, producto);
+        
+        if (resultado.getModifiedCount() == 1) {
+            System.out.println("Producto actualizado exitosamente");
+        } else {
+            System.out.println("No se pudo actualizar el producto");
         }
+    } catch (MongoException e) {
+        System.err.println("Error al actualizar producto: " + e.getMessage());
     }
+}
+
 
 @Override
 public void eliminar(String id) {
@@ -138,19 +140,51 @@ public void eliminar(String id) {
     @Override
 public void actualizarTallasCantidades(String id, Map<String, Integer> tallasCantidades) {
     MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
-    Bson filtro = Filters.eq("_id", new ObjectId(id)); 
+    Bson filtro = Filters.eq("_id", new ObjectId(id));
     Bson actualizacion = Updates.set("tallasCantidades", tallasCantidades);
     try {
-        UpdateResult resultado = coleccionProductos.updateOne(filtro, actualizacion);
-        if (resultado.getMatchedCount() == 0) {
-            // Manejar caso en el que no se encontró el documento
-        }
-    } catch (MongoException e) {
-        // Manejar excepción
+        coleccionProductos.updateOne(filtro, actualizacion);
+        System.out.println("Tallas y cantidades actualizadas para ID: " + id);
+    } catch (Exception e) {
+        System.err.println("Error al actualizar tallas y cantidades: " + e.getMessage());
+    }
+}
+public void actualizarNombre(String id, String nuevoNombre) {
+    MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
+    Bson filtro = Filters.eq("_id", new ObjectId(id));
+    Bson actualizacion = Updates.set("nombre", nuevoNombre);
+    try {
+        coleccionProductos.updateOne(filtro, actualizacion);
+        System.out.println("Nombre actualizado para ID: " + id);
+    } catch (Exception e) {
+        System.err.println("Error al actualizar nombre: " + e.getMessage());
     }
 }
 
-    
+public void actualizarPrecio(String id, double nuevoPrecio) {
+    MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
+    Bson filtro = Filters.eq("_id", new ObjectId(id));
+    Bson actualizacion = Updates.set("precio", nuevoPrecio);
+    try {
+        coleccionProductos.updateOne(filtro, actualizacion);
+        System.out.println("Precio actualizado para ID: " + id);
+    } catch (Exception e) {
+        System.err.println("Error al actualizar precio: " + e.getMessage());
+    }
+}
+public void actualizarCantidad(String id, int nuevaCantidad) {
+    MongoCollection<ProductoDTO> coleccionProductos = obtenerColeccion();
+    Bson filtro = Filters.eq("_id", new ObjectId(id));
+    Bson actualizacion = Updates.set("tallasCantidades.cantidad", nuevaCantidad);
+    try {
+        coleccionProductos.updateOne(filtro, actualizacion);
+        System.out.println("Cantidad actualizada para ID: " + id);
+    } catch (Exception e) {
+        System.err.println("Error al actualizar cantidad: " + e.getMessage());
+    }
+}
+
+
 
 
 }

@@ -3,12 +3,14 @@ package frm;
 
 import PersistenciaDAO.ProductoDAO;
 import com.mycompany.dominiodto.ProductoDTO;
-import java.util.List;
-import java.util.Map;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
 import org.bson.types.ObjectId;
 
+import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -16,23 +18,59 @@ import org.bson.types.ObjectId;
  * @author Ruzzky
  */
 public class frmInventario extends javax.swing.JFrame {
+    private DefaultTableModel modelo;
+    private ProductoDAO productoDAO;
+    private List<ProductoDTO> productos;
+    private int filaSeleccionada = -1;
+    private DefaultTableModel modeloTabla;
+
+
     public frmInventario() {
         initComponents();
-        actualizarTablaInventario();
-        
-    }
-    
-
-public void actualizarTablaInventario() {
-        DefaultTableModel modelo = new DefaultTableModel(new Object[]{"ID", "Nombre", "Categoria", "Talla", "Cantidad", "Precio"}, 0) {
+        productoDAO = new ProductoDAO();
+        modeloTabla = new DefaultTableModel(new Object[]{"ID", "Nombre", "Categoria", "Talla", "Cantidad", "Precio"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                // Hacer que todas las celdas sean editables
+                return true;
             }
         };
-        tabla.setModel(modelo);
-        modelo.setRowCount(0);
-        ProductoDAO productoDAO = new ProductoDAO();
+        tabla.setModel(modeloTabla);
+        actualizarTablaInventario();
+
+tabla.getModel().addTableModelListener(new TableModelListener() {
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        if (e.getType() == TableModelEvent.UPDATE) {
+            int fila = e.getFirstRow();
+            int columna = e.getColumn();
+            Object valorNuevo = tabla.getValueAt(fila, columna);
+
+            // Obtener el ID del producto
+            String idProducto = (String) tabla.getValueAt(fila, 0);
+
+            // Actualizar el valor en la base de datos según la columna modificada
+            switch (columna) {
+                case 1: // Nombre
+                    productoDAO.actualizarNombre(idProducto, (String) valorNuevo);
+                    break;
+                case 4: // Cantidad
+                    productoDAO.actualizarCantidad(idProducto, (int) valorNuevo);
+                    break;
+                case 5: // Precio
+                    productoDAO.actualizarPrecio(idProducto, (double) valorNuevo);
+                    break;
+            }
+            // Actualizar la tabla después de la actualización en la base de datos
+            actualizarTablaInventario();
+        }
+    }
+});
+
+    }
+
+    public void actualizarTablaInventario() {
+        modeloTabla.setRowCount(0); // Limpiar las filas existentes
         List<ProductoDTO> productos = productoDAO.obtenerTodos();
         for (ProductoDTO producto : productos) {
             ObjectId id = producto.getId();
@@ -42,13 +80,11 @@ public void actualizarTablaInventario() {
                 String talla = entry.getKey();
                 int cantidad = entry.getValue();
                 double precio = producto.getPrecio();
-                modelo.addRow(new Object[]{id.toString(), nombre, categoria, talla, cantidad, precio});
+                modeloTabla.addRow(new Object[]{id.toString(), nombre, categoria, talla, cantidad, precio});
             }
         }
     }
 
-
-    
 
 
     @SuppressWarnings("unchecked")
@@ -157,11 +193,11 @@ public void actualizarTablaInventario() {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(143, 143, 143)
                 .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(122, 122, 122)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(85, 85, 85))
+                .addGap(83, 83, 83))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,22 +245,33 @@ public void actualizarTablaInventario() {
     }//GEN-LAST:event_btnRegresarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-    int filaSeleccionada = tabla.getSelectedRow();
-    if (filaSeleccionada != -1) {
-        String idProducto = tabla.getValueAt(filaSeleccionada, 0).toString(); // Obtener el ID del producto de la fila seleccionada
-        frmeditar editar = new frmeditar(idProducto); // Pasar el ID del producto al constructor de frmeditar
-        editar.setVisible(true);
-        editar.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
-                actualizarTablaInventario();
-            }
-        });
-        this.dispose();
-    } else {
-        JOptionPane.showMessageDialog(this, "Seleccione una fila para editar", "Error", JOptionPane.ERROR_MESSAGE);
-    }
+    int filaSeleccionada = tabla.getSelectedRow(); // Obtener la fila seleccionada
+    int columnaSeleccionada = tabla.getSelectedColumn(); // Obtener la columna seleccionada
 
+    if (filaSeleccionada != -1 && columnaSeleccionada != -1) {
+        Object valorNuevo = tabla.getValueAt(filaSeleccionada, columnaSeleccionada);
+        String id = (String) tabla.getValueAt(filaSeleccionada, 0); // Obtener el ID del producto
+
+        // Actualizar el valor en la base de datos según la columna modificada
+        switch (columnaSeleccionada) {
+            case 1: // Nombre
+                productoDAO.actualizarNombre(id, (String) valorNuevo);
+                break;
+            case 4: // Cantidad
+                productoDAO.actualizarCantidad(id, (int) valorNuevo);
+                break;
+            case 5: // Precio
+                productoDAO.actualizarPrecio(id, (double) valorNuevo);
+                break;
+        }
+
+        // Actualizar la tabla después de la actualización en la base de datos
+        actualizarTablaInventario();
+
+        JOptionPane.showMessageDialog(this, "Producto actualizado correctamente");
+    } else {
+        JOptionPane.showMessageDialog(this, "Debe seleccionar una celda primero");
+    }
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
@@ -305,7 +352,7 @@ public void actualizarTablaInventario() {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTable tabla;
+    public javax.swing.JTable tabla;
     private javax.swing.JScrollPane tablaRopa;
     private javax.swing.JTextField txtTipoRopa;
     // End of variables declaration//GEN-END:variables
